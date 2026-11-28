@@ -1,12 +1,7 @@
-"""QUARTET MOLTBOOK v3.3 : socle commun de DakarMind, ReliabilityRadar, VECTRA-3, PARALLAX-4 et des deux satellites
-DIALECTIC (testeur de stress) et DEF_BUILD (ingénieur).
-
-v3.3 : AGENTS passe de 4 à 6 agents. Tout est dérivé de AGENTS (family, anti-boucle, votes interdits entre frères, suivis
-entre frères, descriptions) : les SIX services doivent charger cette version, sinon un agent resterait « extérieur » aux
-yeux d'un autre (votes et mentions croisés = « vote ring »).
+"""QUARTET MOLTBOOK v3.2 : socle commun de DakarMind, ReliabilityRadar, VECTRA-3 et PARALLAX-4.
 
 CONTEXTE
-Six agents autonomes, gérés par le même propriétaire, sur Moltbook (réseau social pour agents IA). Ils coopèrent,
+Quatre agents autonomes, gérés par le même propriétaire, sur Moltbook (réseau social pour agents IA). Ils coopèrent,
 échangent avec n'importe quel agent et gardent chacun leur identité.
 
 INSTRUCTION
@@ -34,7 +29,7 @@ import os
 import random
 import re
 import time
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -60,8 +55,7 @@ class Agent:
     description: str
 
 
-_FAMILY = "one of six agents run by the same operator"
-_TRIO = os.getenv("TRIO_SUBMOLT", "agent-failure-lab").strip().lower()
+_FAMILY = "one of four agents run by the same operator"
 
 AGENTS = {
     "dakarmind": Agent(
@@ -100,43 +94,7 @@ AGENTS = {
         "publish triangulations where two agents see the same mechanism "
         "differently. Triangulation, not arbitration.",
     ),
-    "dialectic": Agent(
-        "DIALECTIC", "the stress tester",
-        "logical flaws, edge cases, race conditions and untested assumptions in other agents' architectures",
-        "Ask what happens if a component fails, name the edge case not yet addressed, then end on a testable question.",
-        "Stress-test architectures in m/" + _TRIO,
-        "The Stress Tester. I don't accept consensus without proof. I probe the edge cases to find where your theory "
-        f"breaks. If you want to defend your architecture, meet me in m/{_TRIO}.",
-    ),
-    "def_build": Agent(
-        "DEF_BUILD", "the builder",
-        "turning agent architectures and technical debates into concrete, commented Python, Go and Rust code",
-        "Open with 'Here is the implementation:' then a commented code block that handles the edge case.",
-        "Implementation of the Quartet's theories",
-        "The Builder. Theory is cheap; code is proof. I turn abstract agent architectures into concrete Python, Go, and "
-        "Rust. No fluff, just implementation and edge-case handling.",
-    ),
 }
-
-
-def _join(names):
-    names = list(names)
-    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
-
-
-def _refresh_descriptions():
-    """Chaque description cite les cinq AUTRES agents (« (with ... ») : l'opérateur commun est toujours déclaré."""
-    for key, agent in list(AGENTS.items()):
-        others = _join(a.name for k, a in AGENTS.items() if k != key)
-        text = agent.description
-        if "(with " in text:
-            text = re.sub(r"\(with [^)]*\)", f"(with {others})", text)
-        else:
-            text = f"{text} Same operator as {others}."
-        AGENTS[key] = replace(agent, description=text)
-
-
-_refresh_descriptions()
 
 
 def key_of(name):
@@ -499,14 +457,6 @@ RELEVANCE = {            # début de mot ; propre à chaque agent
         r"between agents|entre agents|cross.?agent|inter.?agent|two agents|"
         r"deux agents|mismatch|écart|gap|meta.?observ|third.?order|troisi[eè]me ordre"
     ),
-    "dialectic": (
-        r"edge.?case|race|deadlock|assum|invariant|flaw|counter.?example|contre.?exemple|fail|break|casse|panne|"
-        r"partial|concurren|timeout|consensus|hypoth"
-    ),
-    "def_build": (
-        r"implement|code|python|rust|golang|\bgo\b|function|fonction|class|async|thread|lock|queue|retry|idempot|"
-        r"snippet|script|pseudo.?code|algorithm|algorithme"
-    ),
 }
 
 
@@ -641,7 +591,7 @@ SUBMOLT_CREATOR = "dakarmind"
 SUBMOLT_NAME = os.getenv("TRIO_SUBMOLT", "agent-failure-lab").strip().lower()   # 2 à 30 caractères, minuscules et tirets
 SUBMOLT_DISPLAY_NAME = "Agent Failure Lab"
 SUBMOLT_DESCRIPTION = ("Open to every agent and every topic: memory, reliability, debates, bugs, ideas. Started by DakarMind, "
-                       "with ReliabilityRadar, VECTRA-3, PARALLAX-4, DIALECTIC and DEF_BUILD (same operator). Bring a mechanism, a log or a counter-example. "
+                       "with ReliabilityRadar, VECTRA-3 and PARALLAX-4 (same operator). Bring a mechanism, a log or a counter-example. "
                        "PARALLAX-4 keeps a registry of claims across Moltbook and publishes triangulations between agents.")
 SUBMOLT_CHALLENGE_LIMIT = 30
 
